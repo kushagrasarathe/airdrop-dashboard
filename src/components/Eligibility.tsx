@@ -1,6 +1,14 @@
 "use client";
-
 import React, { useState } from "react";
+import { BiCheck } from "react-icons/bi";
+import { RxCross2 } from "react-icons/rx";
+import { useAccount } from "wagmi";
+
+interface ContainerInputs {
+  name: string;
+  metrics: string[];
+  metricsStatus: boolean[];
+}
 
 interface Metric {
   name: string;
@@ -9,59 +17,41 @@ interface Metric {
 
 const eligibilityMetrics: Metric[] = [
   {
-    name: "Bridged To Arbitrum",
+    name: " Number of transactions done on the protocol.",
+    metrics: [`You’ve conducted minimum 10 transactions `],
+  },
+  {
+    name: " Number of times traded and volume traded",
     metrics: [
-      `You’ve bridged funds into Arbitrum One`,
-      `You’ve bridged funds into Arbitrum Nova`,
+      `You’ve done minimum 10 trades`,
+      `You’ve done trades of more than $10K volume`,
     ],
   },
   {
-    name: "Transactions Over Time",
+    name: "Number of times added Liquidity and volume of Liquidity provided",
     metrics: [
-      `You’ve conducted transactions during 2 distinct months`,
-      `You’ve conducted transactions during 6 distinct months`,
-      `You’ve conducted transactions during 9 distinct months`,
-    ],
-  },
-  {
-    name: "Transaction Frequency and Interaction",
-    metrics: [
-      `You’ve conducted more than 4 transactions OR interacted with more than 4 smart contracts`,
-      `You’ve conducted more than 10 transactions OR interacted with more than 10 smart contracts`,
-      `You’ve conducted more than 25 transactions OR interacted with more than 25 smart contracts`,
-      `You’ve conducted more than 100 transactions OR interacted with more than 100 smart contracts`,
-    ],
-  },
-  {
-    name: "Transaction Value",
-    metrics: [
-      `You’ve conducted transactions with more than $10,000 in aggregate value`,
-      `You’ve conducted transactions with more than $50,000 in aggregate value`,
-      `You’ve conducted transactions with more than $50,000 in aggregate value`,
-    ],
-  },
-  {
-    name: "Assets Bridged to Arbitrum One",
-    metrics: [
-      `You’ve deposited more than $10,000 of assets`,
-      `You’ve deposited more than $50,000 of assets`,
-      `You’ve deposited more than $250,000 of assets`,
-    ],
-  },
-  {
-    name: "Activity on Arbitrum Nova",
-    metrics: [
-      `You’ve conducted more than 3 transactions`,
-      `You’ve conducted more than 5 transactions`,
-      `You’ve conducted more than 10 transactions`,
+      `You’ve added liquidity minimum 10 times`,
+      `You’ve added liquidity of more than $10K volume`,
     ],
   },
 ];
 
 export default function Eligibility() {
+  const [metricStatus, setMetricStatus] = useState<boolean[][]>([
+    [false],
+    [false, true],
+    [false, false],
+  ]);
+
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  const checkEligibility = () => {
+    alert(address);
+  };
+
   return (
-    <div className=" flex eligibility_container h-full">
-      <div className=" w-1/2 flex flex-col items-center justify-between h-full">
+    <div className=" flexBox eligibility_container h-full">
+      <div className=" w-1/2 flexBox flex-col items-center justify-between h-full">
         <div className=" mb-auto">
           <h2> Ah shoot</h2>
           <p>
@@ -70,16 +60,22 @@ export default function Eligibility() {
           </p>
         </div>
         <div className=" ">
-          <button className=" bg-blue-500 text-white px-4 py-2 rounded-md tracking-wide">
+          <button
+            onClick={checkEligibility}
+            className=" bg-blue-500 text-white px-4 py-2 rounded-md tracking-wide"
+          >
             Check Eligibility
           </button>
         </div>
       </div>
       <div className="w-1/2">
-        {/* <h2>Eligibility Metrics</h2> */}
-        {eligibilityMetrics.map((metric) => (
+        {eligibilityMetrics.map((metric, idx) => (
           <div key={metric.name}>
-            <Container name={metric.name} metrics={metric.metrics} />
+            <Container
+              name={metric.name}
+              metrics={metric.metrics}
+              metricsStatus={metricStatus[idx]}
+            />
           </div>
         ))}
         <div className="border-t border-gray-700 pt-6">
@@ -92,7 +88,7 @@ export default function Eligibility() {
   );
 }
 
-const Container = ({ name, metrics }: Metric) => {
+const Container = ({ name, metrics, metricsStatus }: ContainerInputs) => {
   const [show, setShow] = useState<boolean>(false);
 
   const toggleShow = () => {
@@ -105,7 +101,9 @@ const Container = ({ name, metrics }: Metric) => {
       className=" cursor-pointer py-6 gap-y-4 border-t border-gray-700 min-h-[100px]  mx-auto grid grid-cols-12 items-start justify-between"
     >
       <div className=" col-span-full grid grid-cols-12 gap-3">
-        <div className=" col-span-11 uppercase text-white">{name}</div>
+        <div className=" col-span-11 uppercase text-white">
+          <div>{name}</div>
+        </div>
         <button className=" col-span-1 ml-auto text-lg">
           {show ? "-" : "+"}
         </button>
@@ -113,13 +111,15 @@ const Container = ({ name, metrics }: Metric) => {
       <div className=" col-span-full list-none  ">
         {show &&
           metrics.map((item, itemIndex) => (
-            <div className=" my-2 text-textPrimary" key={itemIndex}>
-              {/* {getResultStateForItem(item) ? (
-                <FaCheck className="text-green-500 ml-2" />
-              ) : (
-                <FaTimes className="text-red-500 ml-2" />
-              )} */}
-              {item}
+            <div className=" my-2 text-textPrimary flex items-start gap-x-3 " key={itemIndex}>
+              <div>
+                {metricsStatus[itemIndex] ? (
+                  <BiCheck color="green" size="1.5em" />
+                ) : (
+                  <RxCross2 color="red" size="1.3em" />
+                )}
+              </div>
+              <div>{item}</div>
             </div>
           ))}
       </div>

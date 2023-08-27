@@ -27,7 +27,7 @@ body {
   /* padding: 4rem 0; */
 }
 
-.flex {
+.flexBox {
   display: flex;
   justify-content: center;
   margin: 0 auto;
