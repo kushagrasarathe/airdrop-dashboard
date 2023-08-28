@@ -8,36 +8,29 @@ const ACTIONS_APIURL =
 
 const statsQuery = `
   query($id: Bytes) {
-    userStat(id: $id) {
-      id
-      actionCount ## total transactions, condition 1
-      actionMarginCount 
-      actionMintBurnCount
-      uniqueCount
-      actionSwapCount
-      uniqueMarginCount
-      uniqueMintBurnCount
-      uniqueSwapCount
-    }
-    volumeStat(id: $id) {
-      liquidation
-      margin
-      mint
-      swap
-      burn
-    }
+      userData(id: $id) {
+        actionMarginCount
+        actionMintBurnCount
+        actionSwapCount
+        id
+        period
+      }
   }
 `;
 
 const userTradesStats = `
-query($id: Bytes) {
+query($id: Bytes) 
+  {
     userTradesStat(id: $id) {
       account
       burnVolume
+      id
+      lastActiveAt
+      liquidationVolume
       marginVolume
       mintVolume
+      netPnl
       swapVolume
-      liquidationVolume
     }
   }
 `;
@@ -52,30 +45,30 @@ const tradeStatsClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export const getUserStats = async (userId: any) => {
-  statsClient
+export const getUserStats = async (address: any) => {
+  return await statsClient
     .query({
       query: gql(statsQuery),
-      variables: { id: userId },
+      variables: { id: address },
     })
     .then((data) => {
-      console.log("Subgraph data: ", data);
-      return data;
+      // console.log("getUserStats data: ", data.data.userData);
+      return data.data.userData;
     })
     .catch((err) => {
       console.log("Error fetching data: ", err);
     });
 };
 
-export const getUserTradeStats = async (userId: any) => {
-  tradeStatsClient
+export const getUserTradeStats = async (address: any) => {
+  return await tradeStatsClient
     .query({
       query: gql(userTradesStats),
-      variables: { id: userId },
+      variables: { id: `total:0:${address}` },
     })
     .then((data) => {
-      console.log("Subgraph data: ", data);
-      return data;
+      // console.log("Subgraph data: ", data.data.userTradesStat);
+      return data.data.userTradesStat;
     })
     .catch((err) => {
       console.log("Error fetching data: ", err);
