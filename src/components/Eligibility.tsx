@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiCheck } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { useAccount } from "wagmi";
@@ -48,9 +48,18 @@ export default function Eligibility() {
     [false, false],
   ]);
 
+  const [totalNoTransactions, setTotalTransactions] = useState<number | null>(
+    null
+  );
   const [isEligible, setIsEligible] = useState<boolean>(false);
 
   const { address, isConnecting, isDisconnected } = useAccount();
+
+  // useEffect(() => {
+  //   if (!isConnecting && !isDisconnected) {
+  //     userStats();
+  //   }
+  // }, [isConnecting, isDisconnected]);
 
   const checkEligibility = () => {
     userStats();
@@ -62,33 +71,47 @@ export default function Eligibility() {
 
   const userStats = async () => {
     const data = await getUserTradeStats(
-      address
+      // address
+      // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
+      "0x13201714657f8b211f72c5050aeb146d1fafc890"
     );
     const actions = await getUserStats(
-      address
+      // address
+      // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
-      // "0x13201714657f8b211f72c5050aeb146d1fafc890"
-      // "0x13201714657f8b211f72c5050aeb146d1fafc890"
+      "0x13201714657f8b211f72c5050aeb146d1fafc890"
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
     );
 
+    if (data === null || actions === null) {
+      const newMetricStatus = metricStatus.map((row) => row.map(() => false));
+      setMetricStatus(newMetricStatus);
+    }
     if (data !== null || actions !== null) {
       const totalTransactions =
         actions.actionMarginCount +
         actions.actionMintBurnCount +
         actions.actionSwapCount;
+      totalTransactions;
 
       if (totalTransactions >= 10) {
-        const currentMetric = metricStatus;
+        // const currentMetric = metricStatus;
+        const currentMetric = [...metricStatus];
         currentMetric[0][0] = true;
         setMetricStatus(currentMetric);
+      } else if (totalTransactions < 10) {
+        // setTotalTransactions(totalTransactions);
+        alert(
+          `You've done only ${totalTransactions} transactions on the patform, you are not eligible for airdrop.`
+        );
       }
 
       const totalTrades = actions.actionSwapCount;
 
       if (totalTrades >= 10) {
-        const currentMetric = metricStatus;
+        // const currentMetric = metricStatus;
+        const currentMetric = [...metricStatus];
         currentMetric[1][0] = true;
         setMetricStatus(currentMetric);
       }
@@ -96,7 +119,9 @@ export default function Eligibility() {
       const tradeVolume = formatUnits(data.swapVolume, 30);
       // console.log(tradeVolume);
       if (Number(tradeVolume) >= 10000) {
-        const currentMetric = metricStatus;
+        // const currentMetric = metricStatus;
+
+        const currentMetric = [...metricStatus];
         currentMetric[1][1] = true;
         setMetricStatus(currentMetric);
       }
@@ -105,14 +130,16 @@ export default function Eligibility() {
       const liqVolume = formatUnits(data.liquidationVolume, 30);
       // console.log(tradeVolume);
       if (Number(liqVolume) >= 10000) {
-        const currentMetric = metricStatus;
+        // const currentMetric = metricStatus;
+        const currentMetric = [...metricStatus];
+
         currentMetric[2][1] = true;
         setMetricStatus(currentMetric);
       }
     }
 
-    // console.log(data)
-    // console.log(actions)
+    console.log(data);
+    console.log(actions);
     // console.log(metricStatus)
   };
 
@@ -138,6 +165,12 @@ export default function Eligibility() {
                 still participate in the ecosystem and governance in several
                 ways.
               </p>
+              {totalNoTransactions && (
+                <div className=" text-red-500 text-lg font-semibold tracking-wide">
+                  You have made {totalNoTransactions} transactions on the
+                  platform.
+                </div>
+              )}
             </>
           )}
         </div>
