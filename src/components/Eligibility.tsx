@@ -71,16 +71,16 @@ export default function Eligibility() {
 
   const userStats = async () => {
     const data = await getUserTradeStats(
-      // address
+      address
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
-      "0x13201714657f8b211f72c5050aeb146d1fafc890"
+      // "0x13201714657f8b211f72c5050aeb146d1fafc890"
     );
     const actions = await getUserStats(
-      // address
+      address
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
-      "0x13201714657f8b211f72c5050aeb146d1fafc890"
+      // "0x13201714657f8b211f72c5050aeb146d1fafc890"
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
     );
 
