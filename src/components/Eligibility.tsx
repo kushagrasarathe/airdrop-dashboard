@@ -52,6 +52,7 @@ export default function Eligibility() {
     null
   );
   const [isEligible, setIsEligible] = useState<boolean>(false);
+  const [userAddress, setUserAddress] = useState<string>("");
 
   const { address, isConnecting, isDisconnected } = useAccount();
 
@@ -60,6 +61,12 @@ export default function Eligibility() {
   //     userStats();
   //   }
   // }, [isConnecting, isDisconnected]);
+
+  // useEffect(() => {
+  //   const lowerCaseAddress = address?.toLowerCase();
+  //   console.log(lowerCaseAddress);
+  //   setUserAddress(address as string);
+  // }, [address]);
 
   const checkEligibility = () => {
     userStats();
@@ -71,13 +78,15 @@ export default function Eligibility() {
 
   const userStats = async () => {
     const data = await getUserTradeStats(
-      address
+      address?.toLowerCase()
+      // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
       // "0x13201714657f8b211f72c5050aeb146d1fafc890"
     );
     const actions = await getUserStats(
-      address
+      address?.toLowerCase()
+      // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x26e76b18d4a132a9397c46af11e4688bdb602e92"
       // "0x85548b1405cc1938f430bdef69a3e92fae17c11a"
       // "0x13201714657f8b211f72c5050aeb146d1fafc890"
@@ -87,7 +96,12 @@ export default function Eligibility() {
     if (data === null || actions === null) {
       const newMetricStatus = metricStatus.map((row) => row.map(() => false));
       setMetricStatus(newMetricStatus);
+      // alert("You are not eligible for the airdrop");
     }
+    if (data === null && actions === null) {
+      alert("You are not eligible for the airdrop");
+    }
+
     if (data !== null || actions !== null) {
       const totalTransactions =
         actions.actionMarginCount +
@@ -128,7 +142,7 @@ export default function Eligibility() {
 
       // console.log(data)
       const liqVolume = formatUnits(data.liquidationVolume, 30);
-      // console.log(tradeVolume);
+      console.log(liqVolume);
       if (Number(liqVolume) >= 10000) {
         // const currentMetric = metricStatus;
         const currentMetric = [...metricStatus];
